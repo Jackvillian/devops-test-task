@@ -33,3 +33,5 @@ Source code: https://github.com/kirpit/django-sample-app
 
 Push final project to your GitHub public repository.
 
+Consider how you can extend this task. Any thoughts are welcome.
+
