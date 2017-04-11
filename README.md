@@ -14,16 +14,22 @@ Minimum set of roles
 
 Role: postgres
 
-Run container with persistent volume mounted. 
+Run container with persistent volume mounted.
+
 Create a container, create DB and user - django.
 
 Role: django
 
-Run container with python3.5
-Install all dependencies and run all build tasks. 
+Run container based on debian:stable
+
+Determine and install all dependencies. 
+
+Deploy sample project and run all build tasks. 
+
 Put settings.py template with decrypted secrets to project root_dir.
 Then, execute app with the uwsgi.
 
 Source code: https://github.com/kirpit/django-sample-app
 
+Push final project to your GitHub public repository.
 
