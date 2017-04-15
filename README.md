@@ -29,6 +29,8 @@ Deploy sample project and run all build tasks.
 Put settings.py template with decrypted secrets to project root_dir.
 Then, execute app with the uwsgi.
 
+## Be sure to write a detailed description, with usage instructions for end users (it is assumed that this will be the developers).
+
 Source code: https://github.com/kirpit/django-sample-app
 
 Push final project to your GitHub public repository.
