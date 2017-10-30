@@ -1,0 +1,8 @@
+---
+  - hosts: example_app_host
+    user: dbogdanov
+    become: yes
+
+    roles:
+      - docker
+      - build_example

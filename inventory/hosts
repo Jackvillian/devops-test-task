@@ -1,0 +1,5 @@
+[example_app_host]
+192.168.2.102
+
+[example_app_host:vars]
+ansible_python_interpreter=/usr/bin/python3

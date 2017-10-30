@@ -1,0 +1,52 @@
+---
+  - include_vars: ../../../example_app_vault.yml
+  - name: pull postgres image
+    docker_image: name=postgres state=present tag=latest
+  - name: pull base image ubuntu
+    docker_image: name=ubuntu state=present tag=16.04
+  - name: create work dir
+    action: file path=/var/repos/ state=directory mode=0770
+  - name: download app
+    git:
+      repo: https://github.com/kirpit/django-sample-app.git
+      dest: /var/repos/project
+      force: yes
+  - action: shell rm -rf /var/repos/project/example-app && mv /var/repos/project/projectname /var/repos/project/example-app
+  - name: configure dockerfile
+    template: src=templates/Dockerfile dest=/var/repos/Dockerfile
+  - name: configure default.py
+    template: src=templates/default.py dest=/var/repos/project/example-app/settings/default.py
+  - name: configure local.py
+    template: src=templates/local.py dest=/var/repos/project/example-app/settings/local.py
+  - name: configure wsgi.py
+    template: src=templates/wsgi.py dest=/var/repos/project/example-app/wsgi.py
+
+  - name: build the image
+    docker_image: name=django-app  tag=latest path=/var/repos/ state=present
+  - name: up postgres
+    docker: name=postgres image=postgres state=started
+    #env:
+     # POSTGRES_PASSWORD: postgrespass
+  - name: up django-app
+    docker:
+      name: django-example-app
+      image: django-app
+      links:
+        - postgres:postgres
+      ports:
+        - "80:8000"
+  - name: wait, when the all services started
+    pause:
+     seconds: 40
+  - name: create db
+    action: shell docker exec postgres {{item}}
+    with_items:
+          - su postgres  -c "echo 'create database example_app' | psql"
+          - su postgres  -c "echo CREATE USER engine_app WITH password \'{{db_example_pass[0]}}\'|psql"
+          - su postgres  -c "echo GRANT ALL ON DATABASE engine_app TO engine_app|psql"
+  - name: migrate db
+    action: shell docker exec django-example-app /var/venv/bin/python /project/example-app/example-app/manage.py migrate
+
+
+
+
