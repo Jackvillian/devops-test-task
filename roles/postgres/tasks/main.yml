@@ -1,0 +1,37 @@
+---
+  - include_vars: ../../../example_app_vault.yml
+  - name: pull postgres image
+    docker_image: name=postgres state=present tag=latest
+
+
+  - name: Create a volume
+    action: shell docker volume create pgdata
+
+
+  - name: create docker secret
+    action: shell echo "POSTGRES_PASSWORD:{{postgres_pass}}" | docker secret create postgres-passwd -
+    ignore_errors: yes
+
+
+
+  - name: up postgres
+    docker:
+      name: postgres
+      image: postgres
+      state: started
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+      env:
+        POSTGRES_PASSWORD_FILE=/run/secrets/postgres-passwd
+  - name: wait, when the all services started
+    pause:
+     seconds: 10
+  - name: create db
+    action: shell docker exec postgres {{item}}
+    with_items:
+
+          - su postgres  -c "echo 'create database example_app' | psql"
+          - su postgres  -c "echo CREATE USER engine_app WITH password \'{{db_example_pass[0]}}\'|psql"
+          - su postgres  -c "echo GRANT ALL ON DATABASE engine_app TO engine_app|psql"
+          - bash -c  ' echo "host    all             all             172.17.0.0/24            trust" >> /var/lib/postgresql/data/pg_hba.conf'
+

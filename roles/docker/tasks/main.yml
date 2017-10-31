@@ -27,10 +27,7 @@
  - name: install docker
    apt: name=docker-ce state=present force=yes
 
- - name: pull postgres image
-   docker_image: name=postgres state=present tag=latest
- - name: pull base image ubuntu
-   docker_image: name=ubuntu state=present tag=16.04
+
 
 
 
